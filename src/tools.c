@@ -169,9 +169,9 @@ void FileDialog(bool write, struct canvas *cv)
                         case 'l': 
                             do {
                                 if(LoadCanvas(cv, filePath) == 0) {
-                                    sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                    sprintf(saveNLoadMessage, "Canvas Loaded from file %s", fileNames[selected - 1]);
                                 } else {
-                                    sprintf(saveNLoadMessage, "Failed to save file");
+                                    sprintf(saveNLoadMessage, "Failed to load file");
                                 }
                             } while(0);
                             break;
