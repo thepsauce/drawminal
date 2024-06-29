@@ -1,1 +1,3 @@
-+u gcc -D_GNU_SOURCE -fsanitize=address -g -Isrc -std=c11 -Wall -Werror -Wextra -c src/gfx.c -o build/src/gfx.o
++u gcc -D_GNU_SOURCE -fsanitize=address -g -Isrc -std=c11 -Wall -Werror -Wextra -c src/screen.c -o build/src/screen.o
+
+exit code: [36m1[0m; elapsed time: [36m7.906173747[0m seconds
