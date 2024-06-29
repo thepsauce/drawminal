@@ -99,6 +99,7 @@ void FileDialog(bool write)
 
     char *dirPath = getenv("DRAWMINAL_FILES");
     if (dirPath == NULL) {
+        Panic("NOOOO");
         // TODO print error message
        return;
     }

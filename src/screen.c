@@ -134,7 +134,7 @@ int Dialog(const char *title, const char *format, ...)
     }
 
     va_start(l, format);
-    msg = alloca(len);
+    msg = alloca(len + 1);
     vsprintf(msg, format, l);
     tr = (Rect) {
         r.x + r.w / 5, r.y + r.h / 5,
