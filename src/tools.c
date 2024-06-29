@@ -1,3 +1,4 @@
+#include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -93,34 +94,55 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 
 void FileDialog(bool write)
 {
-    Rect r;
-    struct event ev;
+    (void)write;
+    // Centered rectangle
+    Rect r = {COLS/2 - COLS/4, LINES/2 - LINES/4, COLS/2, LINES/2};
+    // struct event ev;
 
-    (void) write;
+    int selected = 2;
+    int files_len = 4;
+    while(1) {
+        int c = getch();
+        switch(c) {
+            case 'w':
+                clear();
+                do {
+                    DrawBox("File Explorer", &r);
 
-    while (1) {
-        GetDialogRect(&r);
-        DrawBox("Choose file", &r);
+                    // Input guide
+                    attr_on(A_BOLD, NULL);
+                    mvprintw(r.y+2, r.x+2, "use 's' to save to the selected file");
+                    mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
+                    attr_off(A_BOLD, NULL);
 
-        r.x++;
-        r.y++;
-        r.w -= 2;
-        r.h -= 2;
+                    for(int i = 0; i < files_len; i++) {
+                        if (i+1 == selected) {
+                            mvprintw(r.y+i+5, r.x+2, "(%d) File %d <-", i+1, i+1); 
+                        }
+                        mvprintw(r.y+i+5, r.x+2, "(%d) File %d", i+1, i+1); 
+                    }
 
-        for (int e = r.y + r.h; r.y < e; r.y++) {
-            DrawString(stdscr, &r, 0, "FILE");
-        }
-
-        GetEvent(&ev);
-        switch (ev.type) {
-        case EV_KEYDOWN:
-            switch (ev.key) {
-            case 'q':
+                    int c_move = getch();
+                    switch(c_move) {
+                        case 'j':
+                            if (selected < files_len) selected++;
+                            break;
+                        case 'k':
+                            if (selected > 1) selected--;
+                            break;
+                        case 'q':
+                            return;
+                            break;
+                        default:
+                            break;
+                    }
+                } while(1);
+                break;
+            case 'q': 
                 return;
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                continue;
         }
     }
 }
@@ -133,7 +155,7 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
-        case 'w':
+        case 'f':
             FileDialog(true);
             break;
         case 'r':
