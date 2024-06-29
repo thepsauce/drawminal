@@ -99,27 +99,22 @@ void FileDialog(bool write)
 
     char *dirPath = getenv("DRAWMINAL_FILES");
     if (dirPath == NULL) {
+        Panic("NOOOO");
         // TODO print error message
        return;
     }
     // int dirPathlen = strlen(dirPath);
 
     struct tree tree;
+    struct file_list filesList;
 
     if (InitTree(&tree, dirPath)) {
         return;
     }
+    ListFiles(&tree, &filesList);
 
-    char **fileNames = malloc(sizeof(char **));
-    int filesLen = 0;
-    while (NextFile(&tree) == 0) {
-        char buffer[128];
-        sprintf(buffer, "%.*s\n", (int) tree.l, tree.p);
-
-        filesLen++;
-        fileNames = realloc(fileNames, sizeof(char *) * filesLen);
-        fileNames[filesLen - 1] = buffer;
-    }
+    char **fileNames = filesList.f;
+    int filesLen = filesList.nf;
     
     // Centered rectangle
     Rect r = {COLS/2 - COLS/4, LINES/2 - LINES/4, COLS/2, LINES/2};
