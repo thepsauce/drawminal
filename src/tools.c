@@ -122,7 +122,7 @@ void FileDialog(bool write, struct canvas *cv)
     GetDialogRect(&r);
 
     int selected = 2; // Index of the selected file (starts at 1)
-    char saveMessage[512];
+    char saveNLoadMessage[512];
     while(1) {
         int c = getch();
         switch(c) {
@@ -140,7 +140,7 @@ void FileDialog(bool write, struct canvas *cv)
                     }
                     mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
                     // prints path at the end
-                    mvprintw(r.y+r.h-3, r.x+2, "%s", saveMessage);
+                    mvprintw(r.y+r.h-3, r.x+2, "%s", saveNLoadMessage);
                     mvprintw(r.y+r.h-2, r.x+2, "%s", dirPath);
                     attr_off(A_BOLD, NULL);
 
@@ -151,24 +151,27 @@ void FileDialog(bool write, struct canvas *cv)
                         mvprintw(r.y+i+5, r.x+2, "(%d) %s %d", i+1, fileNames[i], i+1); 
                     }
 
+                    char filePath[512];
+                    sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
                     int c_move = getch();
                     switch(c_move) {
                         case 's':
                             do {
-                                char filePath[512];
-                                sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
                                 if(write) {
                                     if(SaveCanvas(cv, filePath) == 0) {
-                                        sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                        sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
                                     } else {
-                                        sprintf(saveMessage, "Failed to save file");
+                                        sprintf(saveNLoadMessage, "Failed to save file");
                                     }
+                                }
+                            } while(0);
+                            break;
+                        case 'l': 
+                            do {
+                                if(LoadCanvas(cv, filePath) == 0) {
+                                    sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
                                 } else {
-                                    if(LoadCanvas(cv, filePath) == 0) {
-                                        sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
-                                    } else {
-                                        sprintf(saveMessage, "Failed to save file");
-                                    }
+                                    sprintf(saveNLoadMessage, "Failed to save file");
                                 }
                             } while(0);
                             break;
