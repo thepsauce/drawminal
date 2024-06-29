@@ -151,9 +151,9 @@ void FileDialog(bool write, struct canvas *cv)
                     switch(c_move) {
                         case 's':
                             do {
-                                char filePath[256];
+                                char filePath[512];
                                 sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
-                                if(SaveCanvas(cv, dirPath) == 0) {
+                                if(SaveCanvas(cv, filePath) == 0) {
                                     sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
                                 } else {
                                     sprintf(saveMessage, "Failed to save file");
