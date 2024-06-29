@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "file.h"
+#include "screen.h"
 #include "ui.h"
 
 /*
@@ -93,7 +94,7 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     return 0;
 }
 
-void FileDialog(bool write)
+void FileDialog(bool write, struct canvas *cv)
 {
     (void) write;
 
@@ -117,9 +118,11 @@ void FileDialog(bool write)
     int filesLen = filesList.nf;
     
     // Centered rectangle
-    Rect r = {COLS/2 - COLS/4, LINES/2 - LINES/4, COLS/2, LINES/2};
+    Rect r;
+    GetDialogRect(&r);
 
     int selected = 2; // Index of the selected file (starts at 1)
+    char saveMessage[512];
     while(1) {
         int c = getch();
         switch(c) {
@@ -133,6 +136,7 @@ void FileDialog(bool write)
                     mvprintw(r.y+2, r.x+2, "use 's' to save to the selected file");
                     mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
                     // prints path at the end
+                    mvprintw(r.y+r.h-3, r.x+2, "%s", saveMessage);
                     mvprintw(r.y+r.h-2, r.x+2, "%s", dirPath);
                     attr_off(A_BOLD, NULL);
 
@@ -145,6 +149,17 @@ void FileDialog(bool write)
 
                     int c_move = getch();
                     switch(c_move) {
+                        case 's':
+                            do {
+                                char filePath[256];
+                                sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
+                                if(SaveCanvas(cv, dirPath) == 0) {
+                                    sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                } else {
+                                    sprintf(saveMessage, "Failed to save file");
+                                }
+                            } while(0);
+                            break;
                         case 'j':
                             if (selected < filesLen) selected++;
                             break;
@@ -158,6 +173,8 @@ void FileDialog(bool write)
                         default:
                             break;
                     }
+                    GetDialogRect(&r);
+                    clear();
                 } while(1);
                 break;
             case 'q': 
@@ -178,10 +195,10 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     case EV_KEYDOWN:
         switch (ev->key) {
         case 'f':
-            FileDialog(true);
+            FileDialog(true, cv);
             break;
         case 'r':
-            FileDialog(false);
+            FileDialog(false, cv);
             break;
         default:
             break;
