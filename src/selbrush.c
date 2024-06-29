@@ -76,6 +76,7 @@ int sbrHandle(struct event *ev)
         }
         break;
     default:
+        break;
     }
     return 0;
 }

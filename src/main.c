@@ -1,6 +1,5 @@
-int main(int argc, char **argv)
+int main(void)
 {
-    (void) argc;
-    (void) argv;
-    return 0;
+	return 0;
 }
+

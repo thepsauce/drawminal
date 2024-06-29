@@ -64,6 +64,7 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         tool->st.n = 0;
         break;
     default:
+        break;
     }
 }
 
@@ -85,6 +86,7 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         SetBrushColor(Brushes.p[Brushes.sel], PAIR_NUMBER(ct));
         break;
     default:
+        break;
     }
     return 0;
 }
@@ -118,6 +120,7 @@ void FileDialog(bool write)
             }
             break;
         default:
+            break;
         }
     }
 }
@@ -137,8 +140,10 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
             FileDialog(false);
             break;
         default:
+            break;
         }
     default:
+        break;
     }
     return 0;
 }

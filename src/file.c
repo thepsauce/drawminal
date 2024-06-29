@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <dirent.h>
 
 static inline int openat_dir(int at, const char *name, int *pfd, DIR **pdir)
 {

@@ -72,5 +72,6 @@ void tbHandle(struct event *ev)
         }
         break;
     default:
+        break;
     }
 }
