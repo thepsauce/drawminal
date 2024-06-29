@@ -94,10 +94,8 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     return 0;
 }
 
-void FileDialog(bool write, struct canvas *cv)
+void FileDialog(struct canvas *cv)
 {
-    (void) write;
-
     char *dirPath = getenv("DRAWMINAL_FILES");
     if (dirPath == NULL) {
         Panic("NOOOO");
@@ -133,11 +131,7 @@ void FileDialog(bool write, struct canvas *cv)
 
                     // Input guide
                     attr_on(A_BOLD, NULL);
-                    if (write) {
-                        mvprintw(r.y+2, r.x+2, "use 's' to save to the selected file");
-                    } else {
-                        mvprintw(r.y+2, r.x+2, "use 'l' to load to the selected file");
-                    }
+                    mvprintw(r.y+2, r.x+2, "use 's' to save or 'l' to load the selected file");
                     mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
                     // prints path at the end
                     mvprintw(r.y+r.h-3, r.x+2, "%s", saveNLoadMessage);
@@ -157,12 +151,10 @@ void FileDialog(bool write, struct canvas *cv)
                     switch(c_move) {
                         case 's':
                             do {
-                                if(write) {
-                                    if(SaveCanvas(cv, filePath) == 0) {
-                                        sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
-                                    } else {
-                                        sprintf(saveNLoadMessage, "Failed to save file");
-                                    }
+                                if(SaveCanvas(cv, filePath) == 0) {
+                                    sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                } else {
+                                    sprintf(saveNLoadMessage, "Failed to save file");
                                 }
                             } while(0);
                             break;
@@ -209,11 +201,8 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
-        case 'w':
-            FileDialog(true, cv);
-            break;
-        case 'l':
-            FileDialog(false, cv);
+        case 'f':
+            FileDialog(cv);
             break;
         default:
             break;
