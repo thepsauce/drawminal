@@ -52,13 +52,13 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         hev = CreateEvent(&cv->hist, HEV_STROKE, NULL);
         if (hev != NULL) {
             hev->st = tool->st;
-            hev->st.p = Malloc(sizeof(*hev->st.p) * (tool->st.n + 1));
+            hev->st.p = Malloc(sizeof(*hev->st.p) * tool->st.n);
             if (hev->st.p == NULL) {
                 DropEvent(&cv->hist);
             } else {
                 hev->st.n = tool->st.n;
                 memcpy(hev->st.p, tool->st.p,
-                    sizeof(*hev->st.p) * (hev->st.n + 1));
+                    sizeof(*hev->st.p) * hev->st.n);
             }
         }
         tool->st.n = 0;
