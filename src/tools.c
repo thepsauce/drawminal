@@ -1,4 +1,5 @@
 #include <ncurses.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -94,13 +95,36 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 
 void FileDialog(bool write)
 {
-    (void)write;
+    (void) write;
+
+    char *dirPath = getenv("DRAWMINAL_FILES");
+    if (dirPath == NULL) {
+        // TODO print error message
+       return;
+    }
+    // int dirPathlen = strlen(dirPath);
+
+    struct tree tree;
+
+    if (InitTree(&tree, dirPath)) {
+        return;
+    }
+
+    char **fileNames = malloc(sizeof(char **));
+    int filesLen = 0;
+    while (NextFile(&tree) == 0) {
+        char buffer[128];
+        sprintf(buffer, "%.*s\n", (int) tree.l, tree.p);
+
+        filesLen++;
+        fileNames = realloc(fileNames, sizeof(char *) * filesLen);
+        fileNames[filesLen - 1] = buffer;
+    }
+    
     // Centered rectangle
     Rect r = {COLS/2 - COLS/4, LINES/2 - LINES/4, COLS/2, LINES/2};
-    // struct event ev;
 
-    int selected = 2;
-    int files_len = 4;
+    int selected = 2; // Index of the selected file (starts at 1)
     while(1) {
         int c = getch();
         switch(c) {
@@ -113,24 +137,27 @@ void FileDialog(bool write)
                     attr_on(A_BOLD, NULL);
                     mvprintw(r.y+2, r.x+2, "use 's' to save to the selected file");
                     mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
+                    // prints path at the end
+                    mvprintw(r.y+r.h-2, r.x+2, "%s", dirPath);
                     attr_off(A_BOLD, NULL);
 
-                    for(int i = 0; i < files_len; i++) {
+                    for(int i = 0; i < filesLen; i++) {
                         if (i+1 == selected) {
-                            mvprintw(r.y+i+5, r.x+2, "(%d) File %d <-", i+1, i+1); 
+                            mvprintw(r.y+i+5, r.x+2, "(%d) %s %d <-", i+1, fileNames[i], i+1); 
                         }
-                        mvprintw(r.y+i+5, r.x+2, "(%d) File %d", i+1, i+1); 
+                        mvprintw(r.y+i+5, r.x+2, "(%d) %s %d", i+1, fileNames[i], i+1); 
                     }
 
                     int c_move = getch();
                     switch(c_move) {
                         case 'j':
-                            if (selected < files_len) selected++;
+                            if (selected < filesLen) selected++;
                             break;
                         case 'k':
                             if (selected > 1) selected--;
                             break;
                         case 'q':
+                            free(fileNames);
                             return;
                             break;
                         default:
