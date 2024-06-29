@@ -146,9 +146,9 @@ void FileDialog(bool write, struct canvas *cv)
 
                     for(int i = 0; i < filesLen; i++) {
                         if (i+1 == selected) {
-                            mvprintw(r.y+i+5, r.x+2, "(%d) %s %d <-", i+1, fileNames[i], i+1); 
+                            mvprintw(r.y+i+5, r.x+2, "(%d) %s<-", i+1, fileNames[i]); 
                         }
-                        mvprintw(r.y+i+5, r.x+2, "(%d) %s %d", i+1, fileNames[i], i+1); 
+                        mvprintw(r.y+i+5, r.x+2, "(%d) %s", i+1, fileNames[i]); 
                     }
 
                     char filePath[512];
