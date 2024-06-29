@@ -126,14 +126,18 @@ void FileDialog(bool write, struct canvas *cv)
     while(1) {
         int c = getch();
         switch(c) {
-            case 'w':
+            case 'f':
                 clear();
                 do {
                     DrawBox("File Explorer", &r);
 
                     // Input guide
                     attr_on(A_BOLD, NULL);
-                    mvprintw(r.y+2, r.x+2, "use 's' to save to the selected file");
+                    if (write) {
+                        mvprintw(r.y+2, r.x+2, "use 's' to save to the selected file");
+                    } else {
+                        mvprintw(r.y+2, r.x+2, "use 'l' to load to the selected file");
+                    }
                     mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
                     // prints path at the end
                     mvprintw(r.y+r.h-3, r.x+2, "%s", saveMessage);
@@ -153,10 +157,18 @@ void FileDialog(bool write, struct canvas *cv)
                             do {
                                 char filePath[512];
                                 sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
-                                if(SaveCanvas(cv, filePath) == 0) {
-                                    sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                if(write) {
+                                    if(SaveCanvas(cv, filePath) == 0) {
+                                        sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                    } else {
+                                        sprintf(saveMessage, "Failed to save file");
+                                    }
                                 } else {
-                                    sprintf(saveMessage, "Failed to save file");
+                                    if(LoadCanvas(cv, filePath) == 0) {
+                                        sprintf(saveMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                                    } else {
+                                        sprintf(saveMessage, "Failed to save file");
+                                    }
                                 }
                             } while(0);
                             break;
@@ -194,10 +206,10 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
-        case 'f':
+        case 'w':
             FileDialog(true, cv);
             break;
-        case 'r':
+        case 'l':
             FileDialog(false, cv);
             break;
         default:
