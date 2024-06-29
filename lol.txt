@@ -1,0 +1,1 @@
++u gcc -D_GNU_SOURCE -fsanitize=address -g -Isrc -std=c11 -Wall -Werror -Wextra -c src/gfx.c -o build/src/gfx.o

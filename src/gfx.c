@@ -523,7 +523,7 @@ void DrawBox(const char *title, Rect *r)
     /* draw title */
     if (title != NULL) {
         Rect t;
-        char b[strlen(title) + 2];
+        char b[strlen(title) + 3];
 
         t.x = r->x + 2;
         t.y = r->y;
