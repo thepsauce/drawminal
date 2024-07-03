@@ -16,7 +16,6 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev);
 int cvHandle(struct canvas *cv, struct event *ev);
 
 void cpHandle(struct event *ev);
-void sbrHandle(struct event *ev);
 void tbHandle(struct event *ev);
 
 void RenderUI(void)
@@ -52,7 +51,7 @@ void RenderUI(void)
         Brushes.w = COLS - Canvases.p[Canvases.sel].w;
         Brushes.h = Canvases.p[Canvases.sel].h;
 
-        Toolbar.x = 0;
+        Toolbar.x = 4;
         Toolbar.y = LINES - 2;
         Toolbar.w = COLS;
         Toolbar.h = 2;
@@ -65,7 +64,6 @@ void RenderUI(void)
             &Canvases.p[Canvases.sel], &ev);
     tbHandle(&ev);
     cpHandle(&ev);
-    sbrHandle(&ev);
 }
 
 int RunUI(void)
@@ -143,7 +141,6 @@ int RunUI(void)
         Toolbar.t[Toolbar.sel].handle(&Toolbar.t[Toolbar.sel],
             &Canvases.p[Canvases.sel], &ev);
         tbHandle(&ev);
-        sbrHandle(&ev);
     }
     return 0;
 }

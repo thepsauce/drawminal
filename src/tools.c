@@ -1,9 +1,9 @@
-#include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "file.h"
+#include "gfx.h"
 #include "screen.h"
 #include "ui.h"
 
@@ -16,9 +16,14 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 {
     struct hist_event *hev;
     struct brush *br;
+    Rect r;
 
     switch (ev->type) {
     case EV_DRAW:
+        r = (Rect) { Toolbar.x, Toolbar.y, Toolbar.w, Toolbar.h };
+        DrawString(stdscr, &r, DS_DSEQ,
+                "$rn$0ormal $rt$0hick $re$0rase $r<Return>$0",
+                tool->am ? A_BOLD : 0, tool->sm ? A_BOLD : 0);
         br = Brushes.p[Brushes.sel];
         if (tool->st.n == 0) {
             DrawPatLine(br->pat, stdscr, Mouse.x, Mouse.y, Mouse.x, Mouse.y, br->o);
@@ -67,6 +72,17 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         tool->st.n = 0;
         break;
     default:
+        switch(ev->key) {
+            case 'n':
+                Brushes.sel = 0;
+                break;
+            case 't':
+                Brushes.sel = 1;
+                break;
+            case 'e':
+                Brushes.sel = 2;
+                break;
+        }
         break;
     }
 }
@@ -115,11 +131,10 @@ void FileDialog(struct canvas *cv)
     char **fileNames = filesList.f;
     int filesLen = filesList.nf;
     
-    // Centered rectangle
     Rect r;
     GetDialogRect(&r);
 
-    int selected = 2; // Index of the selected file (starts at 1)
+    int selected = 1; // Index of the selected file (starts at 1)
     char saveNLoadMessage[512];
     while(1) {
         int c = getch();
@@ -162,6 +177,8 @@ void FileDialog(struct canvas *cv)
                             do {
                                 if(LoadCanvas(cv, filePath) == 0) {
                                     sprintf(saveNLoadMessage, "Canvas Loaded from file %s", fileNames[selected - 1]);
+                                    refresh();
+                                    return;
                                 } else {
                                     sprintf(saveNLoadMessage, "Failed to load file");
                                 }
@@ -188,7 +205,7 @@ void FileDialog(struct canvas *cv)
                 return;
                 break;
             default:
-                continue;
+                break;
         }
     }
 }
@@ -196,7 +213,6 @@ void FileDialog(struct canvas *cv)
 int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 {
     (void) tool;
-    (void) cv;
 
     switch (ev->type) {
     case EV_KEYDOWN:

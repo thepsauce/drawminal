@@ -1,6 +1,5 @@
 #include "screen.h"
 #include "ui.h"
-#include "macros.h"
 
 #include <limits.h>
 #include <stdlib.h>
