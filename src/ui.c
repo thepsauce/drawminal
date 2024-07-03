@@ -43,7 +43,7 @@ void RenderUI(void)
     } else {
         Canvases.p[Canvases.sel].x = 0;
         Canvases.p[Canvases.sel].y = 1;
-        Canvases.p[Canvases.sel].w = Brushes.v ? COLS * 2 / 3 : COLS;
+        Canvases.p[Canvases.sel].w = COLS - 2;
         Canvases.p[Canvases.sel].h = LINES - 3;
 
         Brushes.x = Canvases.p[Canvases.sel].w;
