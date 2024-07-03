@@ -24,9 +24,7 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     case EV_DRAW:
         r = (Rect) { Toolbar.x, Toolbar.y, Toolbar.w, Toolbar.h };
         attr_set(A_NORMAL, 0, 0);
-        unsigned offset;
-        submenu:
-        offset = 0;
+        unsigned offset = 0;
         for (size_t i = 0; i < Brushes.n; ++i) {
             char *option = BrushOptions[i];
             if (Brushes.sel == i) {
@@ -90,7 +88,6 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         case EV_RBUTTONDOWN: 
             if (Brushes.sel < Brushes.n) Brushes.sel++;
             if (Brushes.sel == Brushes.n) Brushes.sel = 0;
-            goto submenu;
             break;
         }
         break;
