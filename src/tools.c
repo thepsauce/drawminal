@@ -53,9 +53,6 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
             AddPoint(&tool->st, (Point) { Mouse.x - cv->x, Mouse.y - cv->y });
         }
         break;
-    case EV_RBUTTONDOWN:
-        tool->st.n = 0;
-        break;
     case EV_LBUTTONUP:
         if (tool->st.n == 0) {
             break;
@@ -85,12 +82,15 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         break;
     default:
         switch(ev->key) {
-        case EV_RBUTTONDOWN: 
-            if (Brushes.sel < Brushes.n) Brushes.sel++;
-            if (Brushes.sel == Brushes.n) Brushes.sel = 0;
+        case 'j': 
+            if (Brushes.sel < Brushes.n - 1) Brushes.sel++;
             break;
-        }
+        case 'k':
+            if (Brushes.sel > 0) Brushes.sel--;
+            break;
         break;
+        
+        }
     }
 }
 
