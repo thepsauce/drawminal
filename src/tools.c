@@ -18,12 +18,25 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     struct brush *br;
     Rect r;
 
+    char *BrushOptions[] = {"Normal", "Thick", "Erase"};
+
     switch (ev->type) {
     case EV_DRAW:
         r = (Rect) { Toolbar.x, Toolbar.y, Toolbar.w, Toolbar.h };
-        DrawString(stdscr, &r, DS_DSEQ,
-                "$rn$0ormal $rt$0hick $re$0rase $r<Return>$0",
-                tool->am ? A_BOLD : 0, tool->sm ? A_BOLD : 0);
+        attr_set(A_NORMAL, 0, 0);
+        unsigned offset;
+        offset = 0;
+        for (size_t i = 0; i < Brushes.n; ++i) {
+            char *option = BrushOptions[i];
+            if (Brushes.sel == i) {
+                attr_on(A_BOLD, NULL);
+                mvprintw(r.y, r.x + offset, option);
+                attr_off(A_BOLD, NULL);
+            } else {
+                mvprintw(r.y, r.x + offset, option);
+            }
+            offset += strlen(option) + 1;
+        }
         br = Brushes.p[Brushes.sel];
         if (tool->st.n == 0) {
             DrawPatLine(br->pat, stdscr, Mouse.x, Mouse.y, Mouse.x, Mouse.y, br->o);
@@ -43,6 +56,7 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         break;
     case EV_RBUTTONDOWN:
         tool->st.n = 0;
+        Panic("LOL");
         break;
     case EV_LBUTTONUP:
         if (tool->st.n == 0) {
@@ -72,17 +86,6 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         tool->st.n = 0;
         break;
     default:
-        switch(ev->key) {
-            case 'n':
-                Brushes.sel = 0;
-                break;
-            case 't':
-                Brushes.sel = 1;
-                break;
-            case 'e':
-                Brushes.sel = 2;
-                break;
-        }
         break;
     }
 }
@@ -139,73 +142,73 @@ void FileDialog(struct canvas *cv)
     while(1) {
         int c = getch();
         switch(c) {
-            case 'f':
+        case 'f':
+            clear();
+            do {
+                DrawBox("File Explorer", &r);
+
+                // Input guide
+                attr_on(A_BOLD, NULL);
+                mvprintw(r.y+2, r.x+2, "use 's' to save or 'l' to load the selected file");
+                mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
+                // prints path at the end
+                mvprintw(r.y+r.h-3, r.x+2, "%s", saveNLoadMessage);
+                mvprintw(r.y+r.h-2, r.x+2, "%s", dirPath);
+                attr_off(A_BOLD, NULL);
+
+                for(int i = 0; i < filesLen; i++) {
+                    if (i+1 == selected) {
+                        mvprintw(r.y+i+5, r.x+2, "(%d) %s<-", i+1, fileNames[i]); 
+                    }
+                    mvprintw(r.y+i+5, r.x+2, "(%d) %s", i+1, fileNames[i]); 
+                }
+
+                char filePath[512];
+                sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
+                int c_move = getch();
+                switch(c_move) {
+                    case 's':
+                        do {
+                            if(SaveCanvas(cv, filePath) == 0) {
+                                sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
+                            } else {
+                                sprintf(saveNLoadMessage, "Failed to save file");
+                            }
+                        } while(0);
+                        break;
+                    case 'l': 
+                        do {
+                            if(LoadCanvas(cv, filePath) == 0) {
+                                sprintf(saveNLoadMessage, "Canvas Loaded from file %s", fileNames[selected - 1]);
+                                refresh();
+                                return;
+                            } else {
+                                sprintf(saveNLoadMessage, "Failed to load file");
+                            }
+                        } while(0);
+                        break;
+                    case 'j':
+                        if (selected < filesLen) selected++;
+                        break;
+                    case 'k':
+                        if (selected > 1) selected--;
+                        break;
+                    case 'q':
+                        free(fileNames);
+                        return;
+                        break;
+                    default:
+                        break;
+                }
+                GetDialogRect(&r);
                 clear();
-                do {
-                    DrawBox("File Explorer", &r);
-
-                    // Input guide
-                    attr_on(A_BOLD, NULL);
-                    mvprintw(r.y+2, r.x+2, "use 's' to save or 'l' to load the selected file");
-                    mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
-                    // prints path at the end
-                    mvprintw(r.y+r.h-3, r.x+2, "%s", saveNLoadMessage);
-                    mvprintw(r.y+r.h-2, r.x+2, "%s", dirPath);
-                    attr_off(A_BOLD, NULL);
-
-                    for(int i = 0; i < filesLen; i++) {
-                        if (i+1 == selected) {
-                            mvprintw(r.y+i+5, r.x+2, "(%d) %s<-", i+1, fileNames[i]); 
-                        }
-                        mvprintw(r.y+i+5, r.x+2, "(%d) %s", i+1, fileNames[i]); 
-                    }
-
-                    char filePath[512];
-                    sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
-                    int c_move = getch();
-                    switch(c_move) {
-                        case 's':
-                            do {
-                                if(SaveCanvas(cv, filePath) == 0) {
-                                    sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
-                                } else {
-                                    sprintf(saveNLoadMessage, "Failed to save file");
-                                }
-                            } while(0);
-                            break;
-                        case 'l': 
-                            do {
-                                if(LoadCanvas(cv, filePath) == 0) {
-                                    sprintf(saveNLoadMessage, "Canvas Loaded from file %s", fileNames[selected - 1]);
-                                    refresh();
-                                    return;
-                                } else {
-                                    sprintf(saveNLoadMessage, "Failed to load file");
-                                }
-                            } while(0);
-                            break;
-                        case 'j':
-                            if (selected < filesLen) selected++;
-                            break;
-                        case 'k':
-                            if (selected > 1) selected--;
-                            break;
-                        case 'q':
-                            free(fileNames);
-                            return;
-                            break;
-                        default:
-                            break;
-                    }
-                    GetDialogRect(&r);
-                    clear();
-                } while(1);
-                break;
-            case 'q': 
-                return;
-                break;
-            default:
-                break;
+            } while(1);
+            break;
+        case 'q': 
+            return;
+            break;
+        default:
+            break;
         }
     }
 }
@@ -228,4 +231,3 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     }
     return 0;
 }
-
