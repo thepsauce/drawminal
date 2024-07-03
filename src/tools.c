@@ -90,7 +90,6 @@ void brHandle(struct tool *tool, struct canvas *cv, struct event *ev)
             if (Brushes.sel > 0) Brushes.sel--;
             break;
         break;
-        
         }
     }
 }
