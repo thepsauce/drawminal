@@ -116,6 +116,7 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     return 0;
 }
 
+static size_t selected = 1;
 int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 {
     (void) tool;
@@ -137,12 +138,28 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 
     DrawBox("Files", &r);
 
+    for(size_t i = 0; i < list->nf; i++) {
+        if (i + 1 == selected) {
+            attr_on(A_BOLD, NULL);
+            mvprintw(r.y + 2 + i, r.x + 1, "(%zu) %s", i + 1, list->f[i]);
+            attr_off(A_BOLD, NULL);
+        } else {
+            mvprintw(r.y + 2 + i, r.x + 1, "(%zu) %s", i + 1, list->f[i]);
+        }
+    }
+
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
         case 'w':
             break;
         case 'l':
+            break;
+        case 'j':
+            if (selected < list->nf) selected++;
+            break;
+        case 'k':
+            if (selected > 1) selected--;
             break;
         case 'q':
             DestroyTree(tree);
