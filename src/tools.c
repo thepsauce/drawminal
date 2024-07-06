@@ -117,6 +117,7 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 }
 
 static size_t selected = 1;
+static char file_path[256];
 int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 {
     (void) tool;
@@ -148,12 +149,19 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
         }
     }
 
+    sprintf(file_path, "%s/%s", dir_path, list->f[selected-1]);
+    mvprintw(r.y + r.h - 2, r.x + 1, "%s", file_path);
+
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
         case 'w':
+            SaveCanvas(cv, file_path);
+            mvprintw(r.y + r.h - 3, r.x + 1, "Saved to %s", list->f[selected-1]);
             break;
         case 'l':
+            LoadCanvas(cv, file_path);
+            mvprintw(r.y + r.h - 3, r.x + 1, "Saved to %s", list->f[selected-1]);
             break;
         case 'j':
             if (selected < list->nf) selected++;
