@@ -44,6 +44,8 @@ int LoadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
         Panic("Failed to load from file");
     }
 
+    clear();
+
     int y_max = fgetc(f);
     int x_max = fgetc(f);
 
