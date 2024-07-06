@@ -1,5 +1,4 @@
 #include "screen.h"
-#include "macros.h"
 #include "file.h"
 
 #include <errno.h>
@@ -206,4 +205,25 @@ next:
     }
     tree->ent = ent;
     return 0;
+}
+
+void DestroyTree(struct tree *tree) {
+    // free(tree->stack->dir);
+    free(tree->p);
+    free(tree->dir);
+    free(tree->ent);
+    free(tree);
+}
+
+void DestroyFileList(struct file_list *list) {
+    for(size_t i = 0; i < list->nd; i++) {
+        free(list->d[i]);
+    }
+    free(list->d);
+    for(size_t i = 0; i < list->nf; i++) {
+        free(list->f[i]);
+    }
+    free(list->f);
+
+    free(list);
 }

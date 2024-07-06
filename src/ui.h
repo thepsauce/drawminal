@@ -146,14 +146,8 @@ extern struct colorpicker {
 
 int SaveSession(void);
 
-int SaveCanvas(struct canvas *cv, const char *file);
-int SaveHistory(struct history *hist, FILE *f);
-int SaveHistEvent(struct hist_event *event, FILE *f);
-int SaveStroke(struct stroke *st, FILE *f);
+int SaveCanvas(struct canvas *cv, const char *file_path);
 
 int LoadCanvas(struct canvas *cv, const char *file);
-int LoadHistory(struct history *hist, FILE *f);
-int LoadHistEvent(struct hist_event *event, FILE *f);
-int LoadStroke(struct stroke *st, FILE *f);
 
 #endif

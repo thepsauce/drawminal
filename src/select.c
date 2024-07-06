@@ -1,3 +1,4 @@
+#include "geom.h"
 #include "ui.h"
 
 /*
@@ -325,6 +326,7 @@ int seHandle(struct tool *tool, struct canvas *cv, struct event *ev)
             }
             break;
         case 'c':
+            DeleteRgn(cv->sel);
             return ClearSelectRgn(cv);
 
         case 'd':

@@ -46,5 +46,7 @@ int CatTree(struct tree *tree, const char *name, bool dir);
 int UpTree(struct tree *tree);
 int ClimbTree(struct tree *tree, const char *name);
 int NextFile(struct tree *tree);
+void DestroyTree(struct tree *tree);
+void DestroyFileList(struct file_list *list);
 
 #endif

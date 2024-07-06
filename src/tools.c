@@ -7,7 +7,6 @@
 #include "screen.h"
 #include "ui.h"
 
-int cvHandle(struct canvas *cv, struct event *ev);
 /*
  * implementation of various little tools
  * brush, pipet, file
@@ -117,107 +116,38 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     return 0;
 }
 
-void FileDialog(struct canvas *cv, struct event *ev)
-{
-    char *dirPath = getenv("DRAWMINAL_FILES");
-    if (dirPath == NULL) {
-        Panic("NOOOO");
-        // TODO print error message
-       return;
-    }
-    // int dirPathlen = strlen(dirPath);
-
-    struct tree tree;
-    struct file_list filesList;
-
-    if (InitTree(&tree, dirPath)) {
-        return;
-    }
-    ListFiles(&tree, &filesList);
-
-    char **fileNames = filesList.f;
-    int filesLen = filesList.nf;
-    
-    Rect r;
-    GetDialogRect(&r);
-
-    int selected = 1; // Index of the selected file (starts at 1)
-    char saveNLoadMessage[512];
-    while(1) {
-        clear();
-        do {
-            DrawBox("File Explorer", &r);
-
-            // Input guide
-            attr_on(A_BOLD, NULL);
-            mvprintw(r.y+2, r.x+2, "use 's' to save or 'l' to load the selected file");
-            mvprintw(r.y+3, r.x+2, "use 'j' and 'k' to move down and up the files");
-            // prints path at the end
-            mvprintw(r.y+r.h-3, r.x+2, "%s", saveNLoadMessage);
-            mvprintw(r.y+r.h-2, r.x+2, "%s", dirPath);
-            attr_off(A_BOLD, NULL);
-
-            for(int i = 0; i < filesLen; i++) {
-                if (i+1 == selected) {
-                    mvprintw(r.y+i+5, r.x+2, "(%d) %s<-", i+1, fileNames[i]); 
-                }
-                mvprintw(r.y+i+5, r.x+2, "(%d) %s", i+1, fileNames[i]); 
-            }
-
-            char filePath[512];
-            sprintf(filePath, "%s/%s", dirPath, fileNames[selected - 1]);
-            int c_move = getch();
-            switch(c_move) {
-            case 's':
-                do {
-                    if(SaveCanvas(cv, filePath) == 0) {
-                        sprintf(saveNLoadMessage, "Canvas saved to file %s", fileNames[selected - 1]);
-                    } else {
-                        sprintf(saveNLoadMessage, "Failed to save file");
-                    }
-                } while(0);
-                break;
-            case 'l': 
-                do {
-                    if(LoadCanvas(cv, filePath) == 0) {
-                        sprintf(saveNLoadMessage, "Canvas Loaded from file %s", fileNames[selected - 1]);
-                        cvHandle(cv, ev);
-                        refresh();
-                        return;
-                    } else {
-                        sprintf(saveNLoadMessage, "Failed to load file");
-                    }
-                } while(0);
-                break;
-            case 'j':
-                if (selected < filesLen) selected++;
-                break;
-            case 'k':
-                if (selected > 1) selected--;
-                break;
-            case 'q':
-                free(fileNames);
-                return;
-                break;
-            default:
-                break;
-            }
-            GetDialogRect(&r);
-            clear();
-        } while(1);
-        break;
-    }
-}
-
 int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 {
     (void) tool;
+    (void)cv;
+
+    char *dir_path = getenv("DRAWMINAL_FILES");
+
+    struct tree *tree = malloc(sizeof(*tree));
+    struct file_list *list = malloc(sizeof(*list));
+
+    if(InitTree(tree, dir_path) != 0) {
+        Panic("wtf is happening...");
+    }
+
+    ListFiles(tree, list);
+
+    Rect r;
+    GetDialogRect(&r);
+
+    DrawBox("Files", &r);
 
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
-        case 'f':
-            FileDialog(cv, ev);
+        case 'w':
+            break;
+        case 'l':
+            break;
+        case 'q':
+            DestroyTree(tree);
+            DestroyFileList(list);
+            return 0;
             break;
         default:
             break;
@@ -225,5 +155,8 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     default:
         break;
     }
+
+    DestroyTree(tree);
+    DestroyFileList(list);
     return 0;
 }
