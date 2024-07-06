@@ -118,10 +118,10 @@ int piHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 
 static size_t selected = 1;
 static char file_path[256];
+static char action_message[512];
 int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 {
     (void) tool;
-    (void)cv;
 
     char *dir_path = getenv("DRAWMINAL_FILES");
 
@@ -142,26 +142,26 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     for(size_t i = 0; i < list->nf; i++) {
         if (i + 1 == selected) {
             attr_on(A_BOLD, NULL);
-            mvprintw(r.y + 2 + i, r.x + 1, "(%zu) %s", i + 1, list->f[i]);
-            attr_off(A_BOLD, NULL);
-        } else {
-            mvprintw(r.y + 2 + i, r.x + 1, "(%zu) %s", i + 1, list->f[i]);
         }
+        mvprintw(r.y + 2 + i, r.x + 2, "(%zu) %s", i + 1, list->f[i]);
+        attr_off(A_BOLD, NULL);
     }
 
     sprintf(file_path, "%s/%s", dir_path, list->f[selected-1]);
     mvprintw(r.y + r.h - 2, r.x + 1, "%s", file_path);
+
+    mvprintw(r.y + r.h - 3, r.x + 1, "%s", action_message);
 
     switch (ev->type) {
     case EV_KEYDOWN:
         switch (ev->key) {
         case 'w':
             SaveCanvas(cv, file_path);
-            mvprintw(r.y + r.h - 3, r.x + 1, "Saved to %s", list->f[selected-1]);
+            sprintf(action_message, "Saved to %s", file_path);
             break;
         case 'l':
             LoadCanvas(cv, file_path);
-            mvprintw(r.y + r.h - 3, r.x + 1, "Saved to %s", list->f[selected-1]);
+            sprintf(action_message, "Loaded from %s", file_path);
             break;
         case 'j':
             if (selected < list->nf) selected++;
