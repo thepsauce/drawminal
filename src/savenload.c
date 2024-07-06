@@ -1,6 +1,7 @@
 #include "screen.h"
 #include "ui.h"
 
+#include <ncurses.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -22,16 +23,28 @@ int SaveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
 
     int h, w;
     getmaxyx(cv->data, h, w);
-    fprintf(f, "%d %d", h, w);
+    fprintf(f, "%d %d ", h, w);
 
+    chtype c = mvwinch(cv->data, 0, 0), current_c;
+    attr_t a = c & A_ATTRIBUTES, current_a;
+    unsigned count = 0;
+    unsigned total_count = 0;
     for(int y = 0; y < h; y++) {
-        fputc('\n', f);
         for(int x = 0; x < w; x++) {
-            chtype c = mvwinch(cv->data, y, x); 
-            attr_t a = c & A_ATTRIBUTES;
-            fprintf(f, "%c %d", c, a);
+            current_c = mvwinch(cv->data, y, x); 
+            current_a = current_c & A_ATTRIBUTES;
+            if (c == current_c && a == current_a) {
+                count++;
+            } else {
+                fprintf(f, "(%c|%d|%d)", c, a, count);
+                c = current_c;
+                a = current_a;
+                total_count += count;
+                count = 1;
+            }
         }
     }
+    fprintf(f, "(%c|%d|%d)", ' ', a, (w*h) - total_count);
 
     fclose(f);
     return 0;
@@ -47,18 +60,24 @@ int LoadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
 
     clear();
 
-    int y_max;
-    int x_max;
-    fscanf(f, "%d %d", &y_max, &x_max);
+    unsigned y_max, x_max;
+    fscanf(f, "%d %d ", &y_max, &x_max);
 
-    for(int y = 0; y < y_max; y++) {
-        for(int x = 0; x < x_max; x++) {
-            char c;
-            attr_t a;
-            fscanf(f, "%c %d", &c, &a);
+    unsigned x = 0, y = 0;
+    while(y < y_max) {
+        char c;
+        attr_t a;
+        unsigned count;
+        fscanf(f, "(%c|%d|%d)", &c, &a, &count);
+        for(size_t i = 0; i < count; i++) {
             mvwaddch(cv->data, y, x, c | a);
+            if (x == x_max - 1) {
+                x = 0;
+                y++;
+            } else {
+                x++;
+            }
         }
-        // fgetc(f);
     }
 
     cvHandle(cv, ev);
