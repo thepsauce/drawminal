@@ -12,8 +12,6 @@ int SaveCanvas(struct canvas *cv, const char *file_path)
         Panic("Failed to save to file");
     }
 
-    fwrite(cv->data, sizeof(cv->data), 1, f);
-
     fclose(f);
     return 0;
 }
@@ -25,8 +23,6 @@ int LoadCanvas(struct canvas *cv, const char *file_path) {
     if (f == NULL) {
         Panic("Failed to load from file");
     }
-
-    fread(cv->data, 1, sizeof(cv->data), f);
 
     fclose(f);
     return 0;
