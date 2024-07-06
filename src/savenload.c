@@ -20,12 +20,13 @@ int SaveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
         return 1;
     }
 
-    fputc(cv->h, f);
-    fputc(cv->w, f);
+    int h, w;
+    getmaxyx(cv->data, h, w);
+    fprintf(f, "%d %d", h, w);
 
-    for(int y = 0; y < cv->h; y++) {
+    for(int y = 0; y < h; y++) {
         fputc('\n', f);
-        for(int x = 0; x < cv->w; x++) {
+        for(int x = 0; x < w; x++) {
             chtype c = mvwinch(cv->data, y, x); 
             attr_t a = c & A_ATTRIBUTES;
             fprintf(f, "%c %d", c, a);
@@ -46,8 +47,9 @@ int LoadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
 
     clear();
 
-    int y_max = fgetc(f);
-    int x_max = fgetc(f);
+    int y_max;
+    int x_max;
+    fscanf(f, "%d %d", &y_max, &x_max);
 
     for(int y = 0; y < y_max; y++) {
         for(int x = 0; x < x_max; x++) {
