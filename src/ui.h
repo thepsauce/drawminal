@@ -144,10 +144,8 @@ extern struct colorpicker {
     int x, y, w, h;
 } ColorPicker;
 
-int SaveSession(void);
+int saveCanvas(struct canvas *cv, struct event *ev, const char *file_path);
 
-int SaveCanvas(struct canvas *cv, struct event *ev, const char *file_path);
-
-int LoadCanvas(struct canvas *cv, struct event *ev, const char *file);
+int loadCanvas(struct canvas *cv, struct event *ev, const char *file);
 
 #endif

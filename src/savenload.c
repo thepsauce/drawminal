@@ -5,10 +5,11 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 int cvHandle(struct canvas *cv, struct event *ev);
 
-int SaveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
+int saveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
 {
     (void)ev;
 
@@ -23,7 +24,7 @@ int SaveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
 
     int h, w;
     getmaxyx(cv->data, h, w);
-    fprintf(f, "%d %d ", h, w);
+    fprintf(f, "drml %d %d ", h, w);
 
     chtype c = mvwinch(cv->data, 0, 0), current_c;
     attr_t a = c & A_ATTRIBUTES, current_a;
@@ -50,7 +51,7 @@ int SaveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
     return 0;
 }
 
-int LoadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
+int loadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
     (void)cv;
 
     FILE *f = fopen(file_path, "rb");
@@ -60,8 +61,14 @@ int LoadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
 
     clear();
 
+    char file_format[4];
     unsigned y_max, x_max;
-    fscanf(f, "%d %d ", &y_max, &x_max);
+    fscanf(f, "%s %d %d ", file_format, &y_max, &x_max);
+
+    if (strncmp(file_format, "drml", 4) != 0) {
+        Panic("Invalid file format");
+        return -1;
+    }
 
     unsigned x = 0, y = 0;
     while(y < y_max) {

@@ -139,13 +139,15 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
 
     DrawBox("Files", &r);
 
+    init_pair(100, COLOR_BLACK, COLOR_WHITE);
+
     mvprintw(r.y + 1, r.x + 2, "use 'j' and 'k' to move, 'w' to save, 'l' to load");
     for(size_t i = 0; i < list->nf; i++) {
         if (i + 1 == selected) {
-            attr_on(A_BOLD, NULL);
+            attr_on(COLOR_PAIR(100), NULL);
         }
         mvprintw(r.y + 3 + i, r.x + 2, "(%zu) %s", i + 1, list->f[i]);
-        attr_off(A_BOLD, NULL);
+        attr_off(COLOR_PAIR(100), NULL);
     }
 
     sprintf(file_path, "%s/%s", dir_path, list->f[selected-1]);
@@ -157,11 +159,11 @@ int fileHandle(struct tool *tool, struct canvas *cv, struct event *ev)
     case EV_KEYDOWN:
         switch (ev->key) {
         case 'w':
-            SaveCanvas(cv, ev, file_path);
+            saveCanvas(cv, ev, file_path);
             sprintf(action_message, "Saved to %s", file_path);
             break;
         case 'l':
-            LoadCanvas(cv, ev, file_path);
+            loadCanvas(cv, ev, file_path);
             sprintf(action_message, "Loaded from %s", file_path);
             break;
         case 'j':
