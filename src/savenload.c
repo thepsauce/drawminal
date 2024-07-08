@@ -24,7 +24,7 @@ int saveCanvas(struct canvas *cv, struct event *ev, const char *file_path)
 
     int h, w;
     getmaxyx(cv->data, h, w);
-    fprintf(f, "drml %d %d ", h, w);
+    fprintf(f, "%d %d ", h, w);
 
     chtype c = mvwinch(cv->data, 0, 0), current_c;
     attr_t a = c & A_ATTRIBUTES, current_a;
@@ -61,14 +61,8 @@ int loadCanvas(struct canvas *cv, struct event *ev, const char *file_path) {
 
     clear();
 
-    char file_format[4];
     unsigned y_max, x_max;
-    fscanf(f, "%s %d %d ", file_format, &y_max, &x_max);
-
-    if (strncmp(file_format, "drml", 4) != 0) {
-        Panic("Invalid file format");
-        return -1;
-    }
+    fscanf(f, "%d %d ", &y_max, &x_max);
 
     unsigned x = 0, y = 0;
     while(y < y_max) {
